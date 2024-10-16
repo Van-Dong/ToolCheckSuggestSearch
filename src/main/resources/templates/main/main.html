@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{layouts/base :: head('Check Suggest Search')}">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div class="container-fluid my-4">
+    <!-- Header -->
+    <div th:replace="~{layouts/base :: header}"></div>
+    <!--  Simple table  -->
+    <div th:replace="~{table/simple-table :: simple_table('data')}"></div>
+
+    <!--  Detail table  -->
+    <div th:replace="~{table/detail-table :: detail_table('data')}"></div>
+</div>
+
+<!-- Modal create keyword check -->
+<div th:replace="~{modal/modals :: create_keyword_check}"></div>
+
+<!-- Model display image -->
+<div th:replace="~{modal/modals :: display_screenshot}"></div>
+
+<script>
+    $(document).ready(function() {
+        $('#form_create_keyword_Check').on('submit', function(event) {
+            event.preventDefault();
+
+            let form = $(this);
+            var formData = $(this).serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: '/keyword-tracker/create',
+                data: formData,
+                success: function(response) {
+                    alert('Gửi thành công: ' + response);
+                    form.trigger('reset');
+                },
+                error: function(xhr, status, error) {
+                    alert('Gửi không thành công: ' + error);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

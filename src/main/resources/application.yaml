@@ -16,3 +16,8 @@ spring:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
+  web:
+    resources:
+      static-locations: classpath:/static, file:////C:/Users/dongnv/Documents/Assignment/Case_Study_2_SEO/ToolCheckSuggestSearch/screenshots
+  mvc:
+    static-path-pattern: "/screenshots/**"

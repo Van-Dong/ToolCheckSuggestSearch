@@ -1,6 +1,9 @@
 package com.example.ToolCheckSuggestSearch.service;
 
+import com.example.ToolCheckSuggestSearch.constant.Platform;
+import com.example.ToolCheckSuggestSearch.dto.respone.SeleniumResponse;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -18,95 +21,71 @@ import java.time.Instant;
 import java.util.*;
 
 @Service
+@Slf4j
 public class SeleniumService {
-    public String fetchData(String url) {
+    public SeleniumResponse retrieveKeywordSuggestionsWithScreenshot(String searchKeyword, Platform platform, Boolean isPC) {
         WebDriverManager.chromedriver().setup();
         WebDriver driver = new ChromeDriver();
 
-        String baseUrl = "https://www.google.com";
-        String baseUrl2 = "https://www.yahoo.com";
-
         try {
-            driver.get(url);
+            // Open website
+            driver.get(platform.getUrl());
 
-            WebElement searchInput = driver.findElement(By.cssSelector("textarea[name='q']"));
-            searchInput.sendKeys("ceo google ");
+            // Fill keywords in the form and wait result
+            searchAndWaitForSuggestions(searchKeyword, driver);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("ul.G43f7e li"), 0));
+            // Store file
+            String nameScreenshot = storeScreenshot(driver);
 
-            // store file
-            Path screenshotStorageFolder = Paths.get("screenshots");
+            // Take all suggested keyword
+            List<WebElement> suggestions = driver.findElements(By.cssSelector("div.mkHrUc ul.G43f7e li")); // CSS selector cho các gợi ý
+            List<String> keywordSuggestions = suggestions.stream().map(webElement -> webElement.getText().toLowerCase()).toList();
 
-            if (!Files.exists(screenshotStorageFolder)) {
-                Files.createDirectories(screenshotStorageFolder);
-            }
+            // Test
+            log.info("REsult test: {}", keywordSuggestions);
 
-            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            Path destination = screenshotStorageFolder.resolve(Instant.now().getEpochSecond() + "_screenshot.png");
-            Files.copy(screenshot.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
-
-            // Lấy tất cả các gợi ý tìm kiếm
-            List<WebElement> suggestions = driver.findElements(By.cssSelector("ul.G43f7e li")); // CSS selector cho các gợi ý
-
-            // In ra các gợi ý
-            for (WebElement suggestion : suggestions) {
-                System.out.println(suggestion.getText() + ", "); // In ra nội dung của gợi ý
-            }
-            return searchInput.toString();
+            return SeleniumResponse.builder()
+                    .suggestedKeywords(keywordSuggestions)
+                    .imageURl(nameScreenshot)
+                    .build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("An error occurred while saving the file");
+        } catch (TimeoutException e) {
+            log.error("Timeout occurred while waiting for suggestions. Keyword: {}, URL: {}, Time: {}", searchKeyword, platform.name(), Instant.now());
+            fallBack();
         } finally {
-//            driver.quit();
+            driver.quit();
         }
+        return null;
     }
 
+    private void searchAndWaitForSuggestions(String searchKeyword, WebDriver driver) throws TimeoutException {
+        // Fill keywords in the form
+        WebElement searchInput = driver.findElement(By.cssSelector("textarea[name='q']"));
+        searchInput.sendKeys(searchKeyword);
 
-    // Get index of searchResults match partial
-    private List<Integer> allMatch(List<String> displayKeywords, List<String> searchResults) {
-        List<Integer> result = new ArrayList<>();
-        for (String displayKeyword : displayKeywords) {
-            for (int i = 0; i < searchResults.size(); i++) {
-                if (isPartialMatch(displayKeyword, searchResults.get(i))) {
-                    result.add(i);
-                }
-            }
+        // Wait for suggested keyword to show with timeout 10s
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("ul.G43f7e li"), 0));
+    }
+
+    private String storeScreenshot(WebDriver driver) throws IOException {
+        // create directory screenshots/ if not exists
+        Path screenshotStorageFolder = Paths.get("screenshots");
+        if (!Files.exists(screenshotStorageFolder)) {
+            Files.createDirectories(screenshotStorageFolder);
         }
-        return result;
+
+        // Store screenshot file
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        String nameScreenshot = Instant.now().getEpochSecond() + "_screenshot.png";
+        Path destinationPath = screenshotStorageFolder.resolve(nameScreenshot);
+        Files.copy(screenshot.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+        return nameScreenshot;
     }
 
-    // Get index of searchResults match all
-    private List<Integer> partialMatch(List<String> displayKeywords, List<String> searchResults) {
-        List<Integer> result = new ArrayList<>();
-        for (String displayKeyword : displayKeywords) {
-            for (int i = 0; i < searchResults.size(); i++) {
-                if (isAllMatch(displayKeyword, searchResults.get(i))) {
-                    result.add(i);
-                }
-            }
-        }
-        return result;
+    public void fallBack() {
+
     }
-
-    // Check partial match between 2 string
-    private boolean isPartialMatch(String sentence1, String sentence2) {
-        Set<String> wordSet2 = new HashSet<>(List.of(sentence2.toLowerCase().split("\\s+")));
-        String[] words1 = sentence1.toLowerCase().split("\\s+");
-
-        for (String word : words1) {
-            if (wordSet2.contains(word)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Check all match between 2 string
-    private boolean isAllMatch(String sentence1, String sentence2) {
-        Set<String> wordSet1 = new HashSet<>(List.of(sentence1.toLowerCase().split("\\s+")));
-        Set<String> wordSet2 = new HashSet<>(List.of(sentence2.toLowerCase().split("\\s+")));
-
-        return wordSet1.containsAll(wordSet2) || wordSet2.containsAll(wordSet1);
-    }
-
 }

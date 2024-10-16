@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<!-- Modal create keyword check -->
+<div th:fragment="create_keyword_check" class="modal fade" id="create_keyword_check">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-bg-primary opacity-85">
+                <h4 class="modal-title">Create Keyword Check</h4>
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                ></button>
+            </div>
+            <form
+                    method="post"
+                    id="form_create_keyword_Check"
+            >
+                <div class="modal-body">
+                    <!-- Search Keywords -->
+                    <div class="form-group mb-3">
+                        <label for="searchKeyword" class="control-label"
+                        >Search Keywords</label
+                        >
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="searchKeyword"
+                                name="searchKeyword"
+                                required
+                                value=""
+                        />
+                    </div>
+                    <!--  Match Keywords -->
+                    <div class="form-group mb-3">
+                        <label for="matchKeywords" class="control-label"
+                        >Match Keywords</label
+                        >
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="matchKeywords"
+                                name="matchKeywords"
+                                required
+                                value=""
+                        />
+                    </div>
+                    <!-- Performance reward / number of days -->
+                    <div class="form-group mb-3">
+                        <label for="frequencyCheck" class="control-label"
+                        >Performance reward / number of days</label
+                        >
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="frequencyCheck"
+                                name="frequencyCheck"
+                                required
+                                value=""
+                        />
+                    </div>
+                    <!-- Platform -->
+                    <div class="form-group mb-3">
+                        <label
+                                for="platform"
+                                class="mb-1"
+                        >Platform:</label
+                        >
+                        <select class="form-select" id="platform" name="platform" required>
+                            <option value="GOOGLE">GOOGLE</option>
+                            <option value="YAHOO">YAHOO</option>
+                        </select>
+                    </div>
+                    <!-- Matching pattern -->
+                    <div class="form-group mb-3">
+                        <label
+                                for="isAllMatch"
+                                class="mb-1"
+                        >Matching Pattern</label
+                        >
+                        <select
+                                class="form-select"
+                                id="isAllMatch"
+                                name="isAllMatch"
+                                required
+                        >
+                            <option value="false">Partial match</option>
+                            <option value="true">All match</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <p>Device</p>
+                        <label>
+                            <input type="radio" name="isPC" value="true"> PC
+                        </label>
+                        <label>
+                            <input type="radio" name="isPC" value="false"> Mobile
+                        </label>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="form-group mb-3">
+                        <label for="remark" class="control-label"
+                        >Remarks</label
+                        >
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="remark"
+                                name="remark"
+                                required
+                                value=""
+                        />
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                            type="submit"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                            id="btn_submit_create_keyword_check"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Model display image -->
+<div th:fragment="display_screenshot" class="modal fade modal-lg" id="display_screenshot">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-bg-primary opacity-85">
+                <h4 class="modal-title">Display Screenshot</h4>
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <img
+                        class="img-fluid object-fit-container"
+                        alt="image_screenshot"
+                        src="https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-viet-nam-1.jpg"
+                />
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

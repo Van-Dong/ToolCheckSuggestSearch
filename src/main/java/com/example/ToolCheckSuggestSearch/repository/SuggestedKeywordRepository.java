@@ -1,9 +1,9 @@
 package com.example.ToolCheckSuggestSearch.repository;
 
-import com.example.ToolCheckSuggestSearch.entity.Keyword;
+import com.example.ToolCheckSuggestSearch.entity.SuggestedKeyword;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface KeywordRepository extends JpaRepository<Keyword, Long> {
+public interface SuggestedKeywordRepository extends JpaRepository<SuggestedKeyword, Long> {
 }
