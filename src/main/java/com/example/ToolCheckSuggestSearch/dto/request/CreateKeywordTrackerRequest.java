@@ -3,10 +3,7 @@ package com.example.ToolCheckSuggestSearch.dto.request;
 import com.example.ToolCheckSuggestSearch.constant.Platform;
 import com.example.ToolCheckSuggestSearch.entity.SearchResult;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,25 +15,26 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateKeywordTrackerRequest {
-    @NotBlank
+    @NotBlank(message = "Search Keyword is required")
     String searchKeyword;
 
-    @NotBlank
+    @NotBlank(message = "Match Keyword is required")
     String matchKeywords;
 
-    @NotNull
-    @Min(value = 1)
-    @Max(value = 30)
+    @NotNull(message = "Frequency is required")
+    @Min(value = 1, message = "Frequency Check must be in [1, 30]")
+    @Max(value = 30, message = "Frequency Check must be in [1, 30]")
     Byte frequencyCheck;
 
-    @NotNull
+    @NotNull(message = "Platform is required")
     Platform platform;
 
-    @NotNull
+    @NotNull(message = "Matching Pattern is required")
     Boolean isAllMatch;
 
-    @NotNull
+    @NotNull(message = "Device is required")
     Boolean isPC;
 
+    @Size(max = 100, message = "Remark must be maximum 100 characters")
     String remark;
 }

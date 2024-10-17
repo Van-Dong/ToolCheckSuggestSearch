@@ -10,12 +10,27 @@
 <body>
 <div class="container-fluid my-4">
     <!-- Header -->
-    <div th:replace="~{layouts/base :: header}"></div>
+    <div th:replace="~{layouts/base :: header(${months})}"></div>
     <!--  Simple table  -->
-    <div th:replace="~{table/simple-table :: simple_table('data')}"></div>
+    <div th:replace="~{table/simple-table :: simple_table(${data})}"></div>
 
     <!--  Detail table  -->
-    <div th:replace="~{table/detail-table :: detail_table('data')}"></div>
+    <div th:replace="~{table/detail-table :: detail_table(${data})}"></div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item" th:class="${data.hasPrevious() ? '' : 'disabled'}">
+                <a class="page-link" th:href="${'/' + currentMonth.toString().replace('-', '') + '?page=' + (data.number - 1)}" th:if="${data.hasPrevious()}">Trang trước</a>
+            </li>
+
+            <li class="page-item" th:if="${data.totalPages > 0}" th:each="i : ${#numbers.sequence(0, data.totalPages - 1)}" th:class="${i == data.number ? 'active' : ''}">
+                <a class="page-link" th:href="${'/' + currentMonth.toString().replace('-', '') + '?page=' + i}" th:text="${i + 1}"></a>
+            </li>
+
+            <li class="page-item" th:class="${data.hasNext() ? '' : 'disabled'}">
+                <a class="page-link" th:href="${'/' + currentMonth.toString().replace('-', '') + '?page=' + (data.number + 1)}" th:if="${data.hasNext()}">Trang tiếp theo</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <!-- Modal create keyword check -->
@@ -24,9 +39,12 @@
 <!-- Model display image -->
 <div th:replace="~{modal/modals :: display_screenshot}"></div>
 
+<!-- Toast -->
+<div th:replace="~{layouts/base :: toast}"></div>
+
 <script>
     $(document).ready(function() {
-        $('#form_create_keyword_Check').on('submit', function(event) {
+        $('#form_create_keyword_check').on('submit', function(event) {
             event.preventDefault();
 
             let form = $(this);
@@ -37,14 +55,44 @@
                 url: '/keyword-tracker/create',
                 data: formData,
                 success: function(response) {
-                    alert('Gửi thành công: ' + response);
+                    createToast("info", "Create Keyword Tracker Successfully!")
+                    $('.error-message').text('');
+                    $('#create_keyword_check').modal('hide');
                     form.trigger('reset');
                 },
                 error: function(xhr, status, error) {
-                    alert('Gửi không thành công: ' + error);
+                    // createToast('danger', convertObjToStr(xhr.responseJSON))
+                    $('.error-message').text('');
+
+                    // Duyệt qua từng lỗi và hiển thị
+                    $.each(xhr.responseJSON, function(field, message) {
+                        $('#' + field + '-error').text(message);
+                    });
+                    console.log(xhr.responseJSON)
                 }
             });
         });
+
+        $('.modal-link-image').click(function() {
+            var imageUrl = $(this).data('image');
+            $('#link_screenshot').attr('src', imageUrl);
+            $('#display_screenshot').modal('show'); // Hiển thị modal
+        });
+
+        $('#btn-display-switch').click(function () {
+            $('#simple_table').toggleClass("d-none")
+            $('#detail_table').toggleClass("d-none")
+        })
+
+        $('#dateSelect option.option-select-date').each(function () {
+            let optionText = $(this).text()
+            $(this).text(optionText.charAt(0).toUpperCase() + optionText.slice(1).toLowerCase())
+        })
+
+        $('#dateSelect').change(function () {
+            window.location.href = $(this).val();
+        })
+
     });
 </script>
 

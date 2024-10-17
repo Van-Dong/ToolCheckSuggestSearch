@@ -28,12 +28,13 @@ public class ScheduledTaskService {
     KeywordTrackerRepository keywordTrackerRepository;
     SearchResultRepository searchResultRepository;
 
-//    @Scheduled(initialDelay = 10000, fixedRate = 1000 * 60 * 60 * 24)
+    @Scheduled(initialDelay = 10000, fixedRate = 1000 * 60 * 60 * 24)
     private void  keywordTrackingScreenshotTask() {
         keywordTrackerRepository.findAll().stream().forEach(kt -> {
             // capture screenshots and take keyword suggestions
             SeleniumResponse seleniumResponse = seleniumService.
                     retrieveKeywordSuggestionsWithScreenshot(kt.getSearchKeyword(), kt.getPlatform(), kt.getIsPC());
+            if (seleniumResponse == null) return;
 
             List<String> keywordSuggestions = seleniumResponse.getSuggestedKeywords(); // keyword if result of search
             List<String> matchingKeywords = List.of(kt.getMatchKeywords().toLowerCase().split(", "));  // expected keyword
@@ -60,6 +61,7 @@ public class ScheduledTaskService {
             SearchResult searchResult = SearchResult.builder()
                     .urlScreenshot(seleniumResponse.getImageURl())
                     .suggestedKeywords(suggestedKeywordList)
+                    .isMatchFound(!matchingIndices.isEmpty())
                     .keywordTracker(kt)
                     .build();
 

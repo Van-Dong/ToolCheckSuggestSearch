@@ -47,6 +47,15 @@
                 }, 5000);
             }
         }
+
+        // Convert object to String
+        function convertObjToStr(object) {
+            result = ""
+            for (key in object) {
+                result += `<strong>${key}</strong>: ${JSON.stringify(object[key])} <br/>`
+            }
+            return result
+        }
     </script>
     <style>
         .table thead {
@@ -67,18 +76,21 @@
 <body>
 
 <!-- Header -->
-<div th:fragment="header" class="d-flex flex-row align-items-end mb-3">
+<div th:fragment="header(months)" class="d-flex flex-row align-items-end mb-3">
     <div class="p-2">
-        <label for="department" class="mb-1"
+        <label for="dateSelect" class="mb-1"
         >Date:</label
         >
-        <select class="form-select" id="department" name="departmentId">
-            <option value="">October 2024</option>
+        <select class="form-select" id="dateSelect" name="dateSelect">
+            <option value="/">---Select Date---</option>
+            <option class="option-select-date" th:each="month : ${months}" th:value="${'/' + month.toString().replace('-', '')}"
+                    th:text="${month.getMonth() + ' ' + month.getYear()}" th:selected="${currentMonth.equals(month)}">
+            </option>
         </select>
     </div>
     <div class="p-2">
         <p class="mb-1">Operation</p>
-        <button class="btn btn-success">Display Switching</button>
+        <button class="btn btn-success" id="btn-display-switch"><i class="bi bi-arrow-left-right"></i> Display Switching</button>
     </div>
     <div class="p-2">
         <button

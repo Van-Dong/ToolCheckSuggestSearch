@@ -21,3 +21,4 @@ spring:
       static-locations: classpath:/static, file:////C:/Users/dongnv/Documents/Assignment/Case_Study_2_SEO/ToolCheckSuggestSearch/screenshots
   mvc:
     static-path-pattern: "/screenshots/**"
+#    static-path-pattern: "/**"

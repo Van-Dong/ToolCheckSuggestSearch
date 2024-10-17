@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SearchResultRepository extends JpaRepository<SearchResult, Long> {
@@ -17,4 +18,6 @@ public interface SearchResultRepository extends JpaRepository<SearchResult, Long
             "ORDER BY sr.createdAt ASC")
     List<SearchResult> findAllWithCreatedAtInMonthAndByKeywordTrackerId(@Param("month") int month, @Param("year") int year,
                                                                         @Param("keywordTrackerId") Long keywordTrackerId);
+
+    Optional<SearchResult> findFirstByOrderByCreatedAtAsc();
 }

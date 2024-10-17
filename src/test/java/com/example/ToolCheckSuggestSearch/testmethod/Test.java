@@ -1,5 +1,7 @@
 package com.example.ToolCheckSuggestSearch.testmethod;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -7,24 +9,20 @@ import java.util.Set;
 
 public class Test {
     public static void main(String[] args) {
-        List<String> displayKeywords = List.of(
-                "I love programming",
-                "Java is great",
-                "Let's build something amazing"
-        );
-        List<String> searchResults = List.of(
-                "I love programming languages",
-                "Java is great",
-                "This is a test",
-                "Error test code",
-                "No match in here",
-                "Let's build something amazing and exciting"
-        );
+        LocalDate startDate = LocalDate.now(); // Thay thế bằng ngày bắt đầu bạn chỉ định
+        LocalDate currentDate = LocalDate.now();
 
-        List<Integer> matchedIndexes = allMatch(displayKeywords, searchResults);
-        System.out.println(matchedIndexes);
-        List<Integer> matchedIndexesForPartial = partialMatch(displayKeywords, searchResults);
-        System.out.println(matchedIndexesForPartial);
+        // Tạo danh sách các tháng từ startDate đến hiện tại
+        List<YearMonth> months = new ArrayList<>();
+        YearMonth startMonth = YearMonth.from(startDate);
+        YearMonth currentMonth = YearMonth.from(currentDate);
+
+
+        while (!startMonth.isAfter(currentMonth)) {
+            months.add(startMonth);
+            startMonth = startMonth.plusMonths(1);  // Chuyển sang tháng tiếp theo
+        }
+        System.out.println(YearMonth.of(2024,9).toString().replace("-", ""));
     }
 
 

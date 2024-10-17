@@ -6,6 +6,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -24,25 +25,24 @@ import java.util.*;
 @Slf4j
 public class SeleniumService {
     public SeleniumResponse retrieveKeywordSuggestionsWithScreenshot(String searchKeyword, Platform platform, Boolean isPC) {
-        WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = getWebDriver(isPC);
 
         try {
             // Open website
             driver.get(platform.getUrl());
 
             // Fill keywords in the form and wait result
-            searchAndWaitForSuggestions(searchKeyword, driver);
+            searchAndWaitForSuggestions(searchKeyword, platform, driver);
 
             // Store file
             String nameScreenshot = storeScreenshot(driver);
 
             // Take all suggested keyword
-            List<WebElement> suggestions = driver.findElements(By.cssSelector("div.mkHrUc ul.G43f7e li")); // CSS selector cho các gợi ý
+            List<WebElement> suggestions = driver.findElements(By.cssSelector(isPC ? platform.getUlResultSelector() : platform.getUlResultSelectorInMobile())); // CSS selector cho các gợi ý
             List<String> keywordSuggestions = suggestions.stream().map(webElement -> webElement.getText().toLowerCase()).toList();
 
             // Test
-            log.info("REsult test: {}", keywordSuggestions);
+            log.info("Result test: {}", keywordSuggestions);
 
             return SeleniumResponse.builder()
                     .suggestedKeywords(keywordSuggestions)
@@ -59,14 +59,33 @@ public class SeleniumService {
         return null;
     }
 
-    private void searchAndWaitForSuggestions(String searchKeyword, WebDriver driver) throws TimeoutException {
+    public void test() {
+        WebDriver driver = getWebDriver(false);
+        try {
+            driver.get(Platform.GOOGLE.getUrl());
+        } finally {
+//            driver.quit();
+        }
+
+    }
+
+    private WebDriver getWebDriver(boolean isPC) {
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        if (!isPC) {
+            options.setExperimentalOption("mobileEmulation", Map.of("deviceName", "iPhone XR"));
+        }
+        return new ChromeDriver(options);
+    }
+
+    private void searchAndWaitForSuggestions(String searchKeyword, Platform platform, WebDriver driver) throws TimeoutException {
         // Fill keywords in the form
-        WebElement searchInput = driver.findElement(By.cssSelector("textarea[name='q']"));
+        WebElement searchInput = driver.findElement(By.cssSelector(platform.getInputSearchSelector()));
         searchInput.sendKeys(searchKeyword);
 
         // Wait for suggested keyword to show with timeout 10s
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("ul.G43f7e li"), 0));
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(platform.getUlResultSelector()), 0));
     }
 
     private String storeScreenshot(WebDriver driver) throws IOException {

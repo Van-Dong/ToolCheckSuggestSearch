@@ -26,6 +26,8 @@ public class SearchResult {
     @CreationTimestamp
     LocalDate createdAt;
 
+    Boolean isMatchFound = false;
+
     @OneToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = "search_result_id")
     List<SuggestedKeyword> suggestedKeywords;
