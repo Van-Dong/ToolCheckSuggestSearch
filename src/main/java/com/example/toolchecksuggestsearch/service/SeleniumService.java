@@ -52,17 +52,11 @@ public class SeleniumService {
                 // Fill keywords in the form and wait result
                 searchAndWaitForSuggestions(searchKeyword, platform, isPC, driver);
 
-                // Store file
+                // Store screenshot file
                 String nameScreenshot = storeScreenshot(driver);
 
                 // Take all suggested keyword
-                String ulElementContainResultSelector =
-                        isPC ? platform.getUlResultSelector() : platform.getUlResultSelectorInMobile();
-                List<WebElement> suggestions = driver.findElements(
-                        By.cssSelector(ulElementContainResultSelector)); // CSS selector cho các gợi ý
-                List<String> keywordSuggestions = suggestions.stream()
-                        .map(webElement -> webElement.getText().toLowerCase())
-                        .toList();
+                List<String> keywordSuggestions = getKeywordSuggestions(platform, isPC, driver);
 
                 return SeleniumResponse.builder()
                         .suggestedKeywords(keywordSuggestions)
@@ -73,12 +67,7 @@ public class SeleniumService {
                 break;
             } catch (TimeoutException e) {
                 retryCount++;
-                log.error(
-                        "Timeout occurred while waiting for suggestions. Tried {} time with Keyword: {}, URL: {}, Time: {}",
-                        retryCount,
-                        searchKeyword,
-                        platform.name(),
-                        Instant.now());
+                log.error("Timeout after {} tries with Keyword: {}", retryCount, searchKeyword);
             } finally {
                 driver.quit();
             }
@@ -122,5 +111,15 @@ public class SeleniumService {
         Files.copy(screenshot.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
         return nameScreenshot;
+    }
+
+    private List<String> getKeywordSuggestions(Platform platform, boolean isPC, WebDriver driver) {
+        String ulElementContainResultSelector =
+                isPC ? platform.getUlResultSelector() : platform.getUlResultSelectorInMobile();
+        List<WebElement> suggestions = driver.findElements(
+                By.cssSelector(ulElementContainResultSelector)); // CSS selector cho các gợi ý
+        return suggestions.stream()
+                .map(webElement -> webElement.getText().toLowerCase())
+                .toList();
     }
 }

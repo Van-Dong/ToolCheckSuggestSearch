@@ -21,6 +21,7 @@ public class SearchResultService {
     SearchResultRepository searchResultRepository;
 
     public List<YearMonth> getAllSearchedMonths() {
+        // Get Oldest Record
         SearchResult searchResult =
                 searchResultRepository.findFirstByOrderByCreatedAtAsc().orElse(null);
         YearMonth startMonth =
