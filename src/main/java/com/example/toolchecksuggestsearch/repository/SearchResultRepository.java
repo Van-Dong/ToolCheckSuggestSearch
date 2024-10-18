@@ -13,7 +13,7 @@ import com.example.toolchecksuggestsearch.entity.SearchResult;
 @Repository
 public interface SearchResultRepository extends JpaRepository<SearchResult, Long> {
 
-    // Find Search Result of KeywordTracker in Month with Sort
+    // Find SearchResult of KeywordTracker in Month-Year with Sorted by CreatedAt
     @Query("SELECT sr FROM SearchResult sr " + "WHERE sr.keywordTracker.id = :keywordTrackerId "
             + "AND FUNCTION('MONTH', sr.createdAt) = :month "
             + "AND FUNCTION('YEAR', sr.createdAt) = :year "
@@ -21,6 +21,6 @@ public interface SearchResultRepository extends JpaRepository<SearchResult, Long
     List<SearchResult> findAllWithCreatedAtInMonthAndByKeywordTrackerId(
             @Param("month") int month, @Param("year") int year, @Param("keywordTrackerId") Long keywordTrackerId);
 
-    //  Search oldest SearchResult record to get oldest month
+    //  Search the oldest SearchResult record to get the oldest month-year
     Optional<SearchResult> findFirstByOrderByCreatedAtAsc();
 }

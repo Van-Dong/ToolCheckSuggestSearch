@@ -12,6 +12,7 @@ import com.example.toolchecksuggestsearch.entity.KeywordTracker;
 @Repository
 public interface KeywordTrackerRepository extends JpaRepository<KeywordTracker, Long> {
 
+    // Find All KeywordTracker were searched (checked) in Month-Year
     @Query("SELECT kt FROM KeywordTracker kt JOIN FETCH kt.searchResults sr "
             + "WHERE FUNCTION('MONTH', sr.createdAt) = :month AND FUNCTION('YEAR', sr.createdAt) = :year")
     Page<KeywordTracker> findKeywordTrackersWithSearchResultsInMonth(
