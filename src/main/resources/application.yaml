@@ -22,3 +22,7 @@ spring:
   mvc:
     static-path-pattern: "/screenshots/**"
 #    static-path-pattern: "/**"
+selenium:
+  max-retries: 3
+  wait-timeout: 10 # seconds
+  mobile-emulation: "iPhone XR"

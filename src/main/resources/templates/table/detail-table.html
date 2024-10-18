@@ -28,7 +28,7 @@
                     <span th:text="${kw}"></span><br/>
                 </span>
             </td>
-            <td th:text="${searchResult.platform.name()}">GOOGLE</td>
+            <td th:text="${searchResult.platform.name() + (searchResult.isPC ? ' - PC' : ' - Mobile')}">GOOGLE</td>
             <td th:text="${searchResult.isAllMatch ? 'All Match' : 'Partial Match'}">Partial Match</td>
             <td th:each="day : ${#numbers.sequence(1, daysInMonth)}">
                 <div th:each="result, iter : ${searchResult.searchResults}">
@@ -42,7 +42,6 @@
                         </span>
                         </div>
                     </div>
-
                 </div>
             </td>
         </tr>

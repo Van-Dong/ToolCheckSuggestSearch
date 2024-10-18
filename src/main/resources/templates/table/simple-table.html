@@ -30,18 +30,21 @@
                     <span th:text="${kw}"></span><br/>
                 </span>
             </td>
-            <td th:text="${searchResult.platform.name()}">GOOGLE</td>
+            <td th:text="${searchResult.platform.name() + (searchResult.isPC ? ' - PC' : ' - Mobile')}">GOOGLE</td>
             <td th:text="${searchResult.isAllMatch ? 'All Match' : 'Partial Match'}">Partial Match</td>
             <td th:text="${searchResult.remark}"></td>
             <td th:each="day : ${#numbers.sequence(1, daysInMonth)}" class="text-center">
-                    <div th:each="result : ${searchResult.searchResults}">
-                        <p th:if="${result.createdAt.dayOfMonth == day}">
-                            <a href="javascript:void(0)" th:data-image="${'/screenshots/' + result.urlScreenshot}" class="modal-link-image text-decoration-none">
+                <div th:each="result, iter : ${searchResult.searchResults}">
+                    <div th:if="${result.createdAt.dayOfMonth == day}">
+                        <div th:if="${iter.last || searchResult.searchResults[iter.index + 1].createdAt.dayOfMonth != day}">
+                            <a href="javascript:void(0)" th:data-image="${'/screenshots/' + result.urlScreenshot}"
+                               class="modal-link-image text-decoration-none">
                                 <span th:if="${result.isMatchFound}"> <i class="bi bi-check-circle-fill"></i></span>
                                 <span th:unless="${result.isMatchFound}"><strong>-</strong></span>
                             </a>
-                        </p>
+                        </div>
                     </div>
+                </div>
             </td>
         </tr>
         </tbody>
